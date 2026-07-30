@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>DEFENCE ELV SYSTEMS — Enterprise ERP</title>
+    <meta name="theme-color" content="#0a2e1a" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23b8860b'/%3E%3Cstop offset='100%25' stop-color='%23f0d080'/%3E%3C/linearGradient%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230a2e1a'/%3E%3Cstop offset='100%25' stop-color='%231a6e3a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='url(%23bg)' stroke='url(%23g)' stroke-width='2'/%3E%3Cpath d='M 50 15 L 80 30 L 80 55 C 80 75 50 92 50 92 C 50 92 20 75 20 55 L 20 30 Z' fill='none' stroke='url(%23g)' stroke-width='4' stroke-linejoin='round'/%3E%3Ctext x='50' y='58' font-family='Inter, sans-serif' font-size='24' font-weight='800' fill='url(%23g)' text-anchor='middle' letter-spacing='2'%3EELV%3C/text%3E%3Ctext x='50' y='80' font-family='Inter, sans-serif' font-size='8' font-weight='600' fill='%2394a3b8' text-anchor='middle' letter-spacing='1'%3ESYSTEMS%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+    </script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ============================================================
+    LOGIN OVERLAY
+    ============================================================ -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-modal">
+            <div class="login-brand">
+                <i class="fas fa-shield-alt"></i>
+                <h2>DEFENCE ELV</h2>
+                <p>Enterprise ERP — Secure Today, Safer Tomorrow</p>
+            </div>
+            <div class="login-form">
+                <label>Choose your role</label>
+                <div class="role-badge-group" id="roleBadgeGroup">
+                    <div class="role-badge active" data-role="admin">
+                        <i class="fas fa-user-shield"></i>
+                        Admin
+                        <span style="display:block;font-size:0.55rem;font-weight:400;color:var(--text-muted);">Full access</span>
+                    </div>
+                    <div class="role-badge" data-role="viewer">
+                        <i class="fas fa-eye"></i>
+                        Viewer
+                        <span style="display:block;font-size:0.55rem;font-weight:400;color:var(--text-muted);">Read only</span>
+                    </div>
+                </div>
+                <div class="password-field" id="passwordField">
+                    <input type="password" id="loginPassword" placeholder="Enter admin password" />
+                </div>
+                <button id="loginBtn" class="btn-primary"><i class="fas fa-sign-in-alt"></i> Enter</button>
+                <div class="login-error" id="loginError">Invalid password</div>
+                <p class="login-hint">Admin password: <strong>admin123</strong> • Viewer: no password</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    SETTINGS MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="settingsModalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <button class="modal-close" onclick="closeSettingsModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="settings-body">
+                <div class="setting-group">
+                    <h3>Appearance</h3>
+                    <button class="btn-setting" onclick="toggleDarkMode()">
+                        <i class="fas fa-moon"></i> Toggle Dark Mode
+                    </button>
+                </div>
+                <div class="setting-group admin-only">
+                    <h3>Data Management</h3>
+                    <button class="btn-setting" onclick="exportData()">
+                        <i class="fas fa-file-export"></i> Export Data (JSON)
+                    </button>
+                    <button class="btn-setting" onclick="document.getElementById('importInput').click()">
+                        <i class="fas fa-file-import"></i> Import Data (JSON)
+                    </button>
+                    <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(event)" />
+                    <button class="btn-setting" onclick="exportCSV()">
+                        <i class="fas fa-file-csv"></i> Export Items as CSV
+                    </button>
+                </div>
+                <div class="setting-group admin-only">
+                    <h3>Security</h3>
+                    <button class="btn-setting" onclick="openPasswordModal()">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
+                </div>
+                <div class="setting-group">
+                    <h3>About</h3>
+                    <p style="font-size:0.8rem;color:var(--text-secondary);">DEFENCE ELV Systems — Enterprise ERP v3.0<br />Data stored locally in your browser.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    PASSWORD CHANGE MODAL
+    ============================================================ -->
+    <div class="modal-overlay password-modal" id="passwordModalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2><i class="fas fa-lock" style="color:var(--gold);"></i> Change Password</h2>
+                <button class="modal-close" onclick="closePasswordModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="pwd-field">
+                <label>Current Password</label>
+                <input type="password" id="pwdCurrent" placeholder="Enter current password" />
+            </div>
+            <div class="pwd-field">
+                <label>New Password</label>
+                <input type="password" id="pwdNew" placeholder="Enter new password (min 4 chars)" />
+            </div>
+            <div class="pwd-field">
+                <label>Confirm New Password</label>
+                <input type="password" id="pwdConfirm" placeholder="Confirm new password" />
+            </div>
+            <div class="pwd-error" id="pwdError">Passwords do not match or current password is incorrect.</div>
+            <div class="pwd-success" id="pwdSuccess">✅ Password changed successfully!</div>
+            <div class="pwd-actions">
+                <button class="btn-cancel" onclick="closePasswordModal()">Cancel</button>
+                <button class="btn-save" onclick="changePassword()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    SIDEBAR OVERLAY
+    ============================================================ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============================================================
+    APP
+    ============================================================ -->
+    <div class="app">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <svg width="44" height="44" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#b8860b"/>
+                                <stop offset="100%" stop-color="#f0d080"/>
+                            </linearGradient>
+                            <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#0a2e1a"/>
+                                <stop offset="100%" stop-color="#1a6e3a"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" rx="16" fill="url(#bgGrad)" stroke="url(#brandGrad)" stroke-width="2"/>
+                        <path d="M 50 15 L 80 30 L 80 50 C 80 70 50 90 50 90 C 50 90 20 70 20 50 L 20 30 Z" fill="none" stroke="url(#brandGrad)" stroke-width="4" stroke-linejoin="round"/>
+                        <text x="50" y="52" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#94a3b8" text-anchor="middle" letter-spacing="1.5">DEFENCE</text>
+                        <text x="50" y="68" font-family="'Inter', sans-serif" font-size="22" font-weight="800" fill="url(#brandGrad)" text-anchor="middle" letter-spacing="2">ELV</text>
+                        <text x="50" y="84" font-family="'Inter', sans-serif" font-size="7" font-weight="600" fill="#94a3b8" text-anchor="middle" letter-spacing="1">SYSTEMS</text>
+                    </svg>
+                </div>
+                <div>
+                    <h1>DEFENCE ELV</h1>
+                    <span class="brand-sub">Secure Today, Safer Tomorrow</span>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="sidebar-nav">
+                <div class="nav-item dashboard-tab active" id="sidebarDashTab" onclick="navigate('dashboard')">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                    <span class="nav-badge">Live</span>
+                </div>
+            </div>
+
+            <!-- ERP Modules -->
+            <div class="sidebar-section"><span><i class="fas fa-cubes" style="margin-right:5px;"></i> ERP Modules</span></div>
+            <ul class="sidebar-categories" id="erpModulesList">
+                <li onclick="navigate('customers')" id="navCustomers"><i class="fas fa-users"></i> Customers</li>
+                <li onclick="navigate('products')" id="navProducts"><i class="fas fa-box-open"></i> Products Master</li>
+                <li onclick="navigate('ledger')" id="navLedger"><i class="fas fa-book-user"></i> Customer Ledger</li>
+                <li onclick="navigate('statement')" id="navStatement"><i class="fas fa-file-spreadsheet"></i> Statement of Account</li>
+                <li onclick="navigate('payment')" id="navPayment"><i class="fas fa-receipt"></i> Payment Receipt</li>
+            </ul>
+
+            <!-- Quotation & Invoice Tabs -->
+            <div class="sidebar-nav" style="border-bottom:none; padding-top:0.2rem; display:flex; gap:0.2rem;">
+                <div class="nav-item" style="flex:1;justify-content:center;padding:0.4rem 0.3rem; font-size:0.75rem; border-radius:8px;" id="navQuotationTab" onclick="switchDocType('quotation')">
+                    <i class="fas fa-file-invoice"></i> Quotation
+                </div>
+                <div class="nav-item" style="flex:1;justify-content:center;padding:0.4rem 0.3rem; font-size:0.75rem; border-radius:8px;" id="navInvoiceTab" onclick="switchDocType('invoice')">
+                    <i class="fas fa-file-invoice-dollar"></i> Invoice
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="sidebar-section" id="categorySectionLabel">
+                <span><i class="fas fa-folder-open" style="margin-right:5px;"></i> Categories</span>
+                <span style="font-size:0.55rem;opacity:0.6;" id="docTypeLabel">Quotation</span>
+            </div>
+            <ul class="sidebar-categories" id="categoryList"></ul>
+
+            <!-- Monthly Files -->
+            <div class="monthly-files">
+                <div style="padding:0 0.75rem 0.3rem;">
+                    <select id="sidebarCustomerFilter" onchange="switchCategory(currentCategory)" style="width:100%; padding:0.25rem 0.4rem; font-size:0.7rem; background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); border-radius:6px;">
+                        <option value="">All Customers</option>
+                    </select>
+                </div>
+                <div class="customer-context" id="customerContextLabel" style="padding:0 0.75rem 0.1rem;">All Customers</div>
+                <div class="monthly-files-header">
+                    <span><i class="far fa-calendar-alt" style="margin-right:4px;"></i> Documents</span>
+                    <button id="newFileBtn"><i class="fas fa-plus"></i> New</button>
+                </div>
+                <ul class="monthly-files-list" id="monthlyFilesList">
+                    <li class="no-files-msg">Select a category</li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <i class="fas fa-database"></i> Local storage
+            </div>
+        </aside>
+
+        <!-- ===== MAIN ===== -->
+        <main class="main">
+
+            <!-- TOPBAR -->
+            <div class="topbar no-print">
+                <div class="topbar-left">
+                    <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                    <div class="page-indicator">
+                        <h2 id="pageTitle">Dashboard</h2>
+                        <p id="pageSubtitle"><span style="color:var(--gold);font-weight:600;">Analytics</span> &bull; <span>Real-time overview</span></p>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <input type="text" id="globalSearchInput" placeholder="Global Search..." oninput="handleGlobalSearch(this.value)" style="width:160px; padding:0.3rem 0.6rem; font-size:0.75rem; border:1.5px solid var(--gray-200); border-radius:8px; background:var(--input-bg); color:var(--text-primary);" />
+                    <button class="top-btn btn-settings" onclick="openSettingsModal()">
+                        <i class="fas fa-cog"></i> <span>Settings</span>
+                    </button>
+                    <button class="top-btn" onclick="window.print()"><i class="fas fa-print"></i></button>
+                    <button class="top-btn" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                    </button>
+                    <span class="role-indicator" id="roleIndicator">Admin</span>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            BISMILLAH
+            ========================================================== -->
+            <div class="bismillah-wrapper">
+                <div class="bismillah-text">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
+                <div class="bismillah-sub">In the name of Allah, the Most Gracious, the Most Merciful</div>
+            </div>
+
+            <!-- ===== PAGE: DASHBOARD ===== -->
+            <section class="page active" id="page-dashboard">
+                <div class="stats-grid" id="dashboardStats">
+                    <div class="stat-card stat-green">
+                        <div class="stat-glow"></div>
+                        <span class="stat-icon-wrap"><i class="fas fa-chart-line"></i></span>
+                        <div class="stat-label">Total Sales</div>
+                        <div class="stat-value" id="statSales">₹0</div>
+                    </div>
+                    <div class="stat-card stat-blue">
+                        <div class="stat-glow"></div>
+                        <span class="stat-icon-wrap"><i class="fas fa-wallet"></i></span>
+                        <div class="stat-label">Total Received</div>
+                        <div class="stat-value" id="statReceived">₹0</div>
+                    </div>
+                    <div class="stat-card stat-amber">
+                        <div class="stat-glow"></div>
+                        <span class="stat-icon-wrap"><i class="fas fa-exclamation-circle"></i></span>
+                        <div class="stat-label">Outstanding</div>
+                        <div class="stat-value" id="statOutstanding">₹0</div>
+                    </div>
+                    <div class="stat-card stat-red">
+                        <div class="stat-glow"></div>
+                        <span class="stat-icon-wrap"><i class="fas fa-users"></i></span>
+                        <div class="stat-label">Customers</div>
+                        <div class="stat-value" id="statCustomers">0</div>
+                    </div>
+                </div>
+
+                <div class="quick-actions admin-only">
+                    <button onclick="createNewFile()"><i class="fas fa-plus-circle"></i> New File</button>
+                    <button onclick="switchCategory(CATEGORIES[0].id)"><i class="fas fa-folder-open"></i> Open Category</button>
+                    <button onclick="exportData()"><i class="fas fa-file-export"></i> Export Data</button>
+                    <button onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-pie"></i> Revenue by Category</h3>
+                            <span class="card-badge">Pie</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="categoryPieChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-bar"></i> Monthly Revenue</h3>
+                            <span class="card-badge">Bar</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="monthlyBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:0.4rem;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-history"></i> Recent Transactions</h3>
+                        <span class="card-badge">Latest</span>
+                    </div>
+                    <div class="table-container"><table class="items-table"><thead><tr><th>Date</th><th>Type</th><th>Ref</th><th style="text-align:right">Amount</th></tr></thead><tbody id="recentTransactionsBody"></tbody></table></div>
+                </div>
+                <div class="card" style="margin-top:0.4rem;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-star"></i> Top Customers</h3>
+                        <span class="card-badge">Revenue</span>
+                    </div>
+                    <div class="table-container"><table class="items-table"><thead><tr><th>Customer</th><th style="text-align:right">Revenue</th></tr></thead><tbody id="topCustomersBody"></tbody></table></div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: CUSTOMERS ===== -->
+            <section class="page" id="page-customers">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <h2><i class="fas fa-users"></i> Customers Directory</h2>
+                        <button class="btn-primary admin-only" onclick="openCustomerModal()"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                    <div class="table-container"><table class="items-table"><thead><tr><th>ID</th><th>Name / Company</th><th>Mobile</th><th>Email</th><th>GSTIN</th><th>Opening Bal</th><th style="text-align:right">Actions</th></tr></thead><tbody id="customersBody"></tbody></table></div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: PRODUCTS ===== -->
+            <section class="page" id="page-products">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <h2><i class="fas fa-box-open"></i> Products Master</h2>
+                        <button class="btn-primary admin-only" onclick="openProductModal()"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                    <div class="table-container"><table class="items-table"><thead><tr><th>ID</th><th>Product Name</th><th>HSN Code</th><th>Unit Price</th><th>Category</th><th style="text-align:right">Actions</th></tr></thead><tbody id="productsBody"></tbody></table></div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: LEDGER ===== -->
+            <section class="page" id="page-ledger">
+                <div class="card" id="ledgerCard">
+                    <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <h2><i class="fas fa-book-user"></i> Customer Ledger</h2>
+                        <div style="display:flex; gap:1rem;">
+                            <select id="ledgerCustomerSelect" onchange="renderLedger()"><option value="">-- Select --</option></select>
+                            <button class="btn-outline" onclick="downloadPDF('ledgerCard','Ledger')"><i class="fas fa-file-pdf"></i> PDF</button>
+                        </div>
+                    </div>
+                    <div class="table-container"><table class="items-table"><thead><tr><th>Date</th><th>Particulars</th><th>Voucher</th><th style="text-align:right">Debit</th><th style="text-align:right">Credit</th><th style="text-align:right">Balance</th></tr></thead><tbody id="ledgerBody"></tbody><tfoot id="ledgerFoot"></tfoot></table></div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: STATEMENT ===== -->
+            <section class="page" id="page-statement">
+                <div class="card" id="statementCard">
+                    <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <h2><i class="fas fa-file-spreadsheet"></i> Statement of Account</h2>
+                        <div style="display:flex; gap:1rem;">
+                            <select id="statementCustomerSelect" onchange="renderStatement()"><option value="">-- Select --</option></select>
+                            <button class="btn-outline" onclick="downloadPDF('statementCard','Statement')"><i class="fas fa-file-pdf"></i> PDF</button>
+                        </div>
+                    </div>
+                    <div class="table-container"><table class="items-table"><thead><tr><th>Invoice No</th><th>Date</th><th style="text-align:right">Amount</th><th style="text-align:right">Received</th><th style="text-align:right">Balance</th><th style="text-align:center">Status</th></tr></thead><tbody id="statementBody"></tbody><tfoot id="statementFoot"></tfoot></table></div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: PAYMENT ===== -->
+            <section class="page" id="page-payment">
+                <div class="card">
+                    <h2><i class="fas fa-receipt"></i> Record Payment</h2>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; max-width:600px; margin-top:1rem;">
+                        <div class="field"><label>Customer *</label><select id="payCustomer" onchange="populatePayInvoices()"></select></div>
+                        <div class="field"><label>Invoice</label><select id="payInvoice"><option value="">Against Opening/Advance</option></select></div>
+                        <div class="field"><label>Date *</label><input type="date" id="payDate" /></div>
+                        <div class="field"><label>Amount *</label><input type="number" id="payAmount" step="0.01" /></div>
+                        <div class="field"><label>Mode</label><select id="payMode"><option>Bank Transfer</option><option>Cash</option><option>Cheque</option><option>UPI</option></select></div>
+                        <div class="field"><label>Reference</label><input type="text" id="payRef" /></div>
+                    </div>
+                    <button class="btn-primary admin-only" style="margin-top:1rem;" onclick="recordPayment()"><i class="fas fa-save"></i> Record Payment</button>
+                    <h3 style="margin-top:2rem;">Recent Payments</h3>
+                    <div class="table-container"><table class="items-table"><thead><tr><th>Date</th><th>Receipt No</th><th>Customer</th><th>Invoice</th><th style="text-align:right">Amount</th><th>Mode</th><th>Ref</th><th style="text-align:right" class="no-print">Actions</th></tr></thead><tbody id="paymentsBody"></tbody></table></div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: QUOTATION ===== -->
+            <section class="page" id="page-quotation">
+                <div class="doc-card" id="quotationCard">
+                    <div class="doc-header">
+                        <div class="brand">
+                            <h2><i class="fas fa-shield-alt"></i> DEFENCE ELV SYSTEMS</h2>
+                            <div class="brand-tagline">Surveillance &amp; Security Solutions</div>
+                            <div class="brand-gold">✦ ISO 9001:2015 Certified ✦</div>
+                        </div>
+                        <div class="meta">
+                            <span class="label">Date</span> <input type="date" id="q_quoteDate" />
+                            <span class="label">Doc No</span> <input type="text" id="q_quoteNo" placeholder="QT-2026-001" readonly />
+                            <span class="label">PO No</span> <input type="text" id="q_poNo" placeholder="PO #" />
+                            <span class="label">Project</span> <input type="text" id="q_projectArea" placeholder="Project area" />
+                            <span class="label">Brand</span> <input type="text" id="q_brandName" placeholder="Hikvision" />
+                        </div>
+                    </div>
+                    <div class="doc-title"><h1>Q U O T A T I O N</h1></div>
+                    <div class="party-grid">
+                        <div class="party-group">
+                            <label><i class="fas fa-building"></i> VENDOR</label>
+                            <div class="field-row">
+                                <div class="field"><label>Name</label><input type="text" id="q_vendorName" placeholder="KHAJA FAYAZ AHMED" /></div>
+                                <div class="field"><label>Company</label><input type="text" id="q_vendorCompany" placeholder="DEFENCE ELV SYSTEMS" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Address</label><input type="text" id="q_vendorAddress" placeholder="Mawin Gold Plaza, Mehdipatnam" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Phone</label><input type="text" id="q_vendorPhone" placeholder="8179113882" /></div>
+                                <div class="field"><label>Email</label><input type="text" id="q_vendorEmail" placeholder="fayazdefence@gmail.com" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Website</label><input type="text" id="q_vendorWebsite" placeholder="www.defencesurveillance.com" /></div>
+                                <div class="field"><label>GST</label><input type="text" id="q_vendorGst" placeholder="GSTIN" /></div>
+                            </div>
+                        </div>
+                        <div class="party-group">
+                            <label><i class="fas fa-user"></i> CLIENT</label>
+                            <select id="q_docCustomerSelect" onchange="fillDocCustomer('q_')" style="width:100%; margin-bottom:0.4rem;">
+                                <option value="">Load Customer...</option>
+                            </select>
+                            <div class="field-row">
+                                <div class="field"><label>Name</label><input type="text" id="q_clientName" placeholder="Client name" /></div>
+                                <div class="field"><label>Company</label><input type="text" id="q_clientCompany" placeholder="M.A CASTING & DIE CASTING" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Address</label><input type="text" id="q_clientAddress" placeholder="Kukatpally, Hyderabad" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Phone</label><input type="text" id="q_clientPhone" placeholder="Client phone" /></div>
+                                <div class="field"><label>GST</label><input type="text" id="q_clientGst" placeholder="Client GST" /></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-details">
+                        <div class="project-header"><i class="fas fa-clipboard-list"></i> PROJECT DETAILS</div>
+                        <div class="project-grid">
+                            <div class="field"><label>Project Name</label><input type="text" id="q_projectName" placeholder="CCTV Installation - Phase 2" /></div>
+                            <div class="field"><label>Location</label><input type="text" id="q_projectLocation" placeholder="Site address" /></div>
+                            <div class="field"><label>Scope</label><input type="text" id="q_projectScope" placeholder="Supply & Install 20 IP cameras" /></div>
+                            <div class="field"><label>Start Date</label><input type="date" id="q_projectStartDate" /></div>
+                            <div class="field"><label>End Date</label><input type="date" id="q_projectEndDate" /></div>
+                            <div class="field"><label>Manager</label><input type="text" id="q_projectManager" placeholder="Contact person" /></div>
+                        </div>
+                    </div>
+                    <div class="items-section">
+                        <div class="table-wrap">
+                            <table class="items-table" id="q_itemsTable">
+                                <thead><tr><th style="width:36px;">#</th><th style="min-width:220px;">DESCRIPTION</th><th style="width:60px;">QTY</th><th style="width:90px;">UNIT PRICE</th><th style="width:90px;text-align:right;">TOTAL</th><th style="width:70px;text-align:center;">ACTIONS</th></tr></thead>
+                                <tbody id="q_itemsBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="add-item-row admin-only" id="q_addItemRow">
+                            <input type="text" id="q_newItemDesc" placeholder="Item description..." style="flex:2;" />
+                            <input type="text" id="q_newItemHsn" placeholder="HSN" style="flex:0 0 60px;" />
+                            <input type="number" id="q_newItemQty" placeholder="Qty" class="qty-add" value="1" min="1" />
+                            <input type="number" id="q_newItemPrice" placeholder="Price" class="price-add" value="0" min="0" step="0.01" />
+                            <button id="q_addItemBtn"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-box">
+                            <div class="line"><span>Subtotal</span><span class="amount" id="q_subtotalDisplay">₹0.00</span></div>
+                            <div class="line" style="display:flex; align-items:center; gap:0.4rem;">
+                                <span>GST</span>
+                                <input type="number" id="q_gstRate" value="18" min="0" max="100" step="0.5" style="width:50px;padding:0.1rem 0.2rem;font-size:0.75rem;text-align:center;" />
+                                <span>%</span>
+                                <span class="amount" id="q_gstDisplay">₹0.00</span>
+                            </div>
+                            <div class="line total"><span>TOTAL</span><span class="amount" id="q_totalDisplay">₹0.00</span></div>
+                            <div class="amount-in-words"><strong id="q_amountWords">Zero</strong> only</div>
+                        </div>
+                    </div>
+                    <div class="terms-section">
+                        <div class="terms-grid">
+                            <div class="term-box">
+                                <h4><i class="fas fa-handshake"></i> Payment Terms</h4>
+                                <textarea id="q_termsPayment" rows="2">1. 75% advance payment is required upon confirmation of the order. Work will commence once the payment is received.
+                                    2. The remaining 25% is due upon project completion, prior to the handover of login credentials and final documentation.
+                                3. All payments should be made via bank transfer, and receipts will be issued for each transaction.</textarea>
+                            </div>
+                            <div class="term-box">
+                                <h4><i class="fas fa-shield"></i> Warranty Terms</h4>
+                                <textarea id="q_termsWarranty" rows="2">1. 1-year warranty is provided covering manufacturing defects.
+                                    2. The warranty excludes damage caused by electrical burns, physical impact, or misuse.
+                                3. Each CCTV installation includes 1-year complimentary service, which covers routine system checks, basic troubleshooting, and remote support to ensure smooth operation.</textarea>
+                            </div>
+                            <div class="term-box">
+                                <h4><i class="fas fa-tools"></i> Site Requirements</h4>
+                                <textarea id="q_termsSite" rows="2">1. Provision of scaffolding, ladders, or a suitable high table if required for installation.
+                                    2. A reliable internet connection must be available on-site to enable mobile access to CCTV cameras.
+                                3. An LED screen or monitor should be arranged by the client for final configuration and demonstration.</textarea>
+                            </div>
+                            <div class="term-box">
+                                <h4><i class="fas fa-file-signature"></i> Declaration</h4>
+                                <textarea id="q_termsDeclaration" rows="2">1. This quotation is valid for 7 calendar days from the date of issue.
+                                    2. Our business is built on trust, reliability, and client satisfaction. We take pride in delivering high-quality work and maintaining professional standards.</textarea>
+                            </div>
+                        </div>
+                        <div class="terms-footer">
+                            <i class="fas fa-check-circle"></i> All quoted prices are final and inclusive of labor, materials, and installation. No hidden charges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: INVOICE ===== -->
+            <section class="page" id="page-invoice">
+                <div class="doc-card" id="invoiceCard">
+                    <div class="doc-header">
+                        <div class="brand">
+                            <h2><i class="fas fa-shield-alt"></i> DEFENCE ELV SYSTEMS</h2>
+                            <div class="brand-tagline">Surveillance &amp; Security Solutions</div>
+                            <div class="brand-gold">✦ ISO 9001:2015 Certified ✦</div>
+                        </div>
+                        <div class="meta">
+                            <span class="label">Date</span> <input type="date" id="i_quoteDate" />
+                            <span class="label">Doc No</span> <input type="text" id="i_quoteNo" placeholder="INV-2026-001" readonly />
+                            <span class="label">PO No</span> <input type="text" id="i_poNo" placeholder="PO #" />
+                            <span class="label">Project</span> <input type="text" id="i_projectArea" placeholder="Project area" />
+                            <span class="label">Brand</span> <input type="text" id="i_brandName" placeholder="Hikvision" />
+                        </div>
+                    </div>
+                    <div class="doc-title"><h1>I N V O I C E</h1></div>
+                    <div class="party-grid">
+                        <div class="party-group">
+                            <label><i class="fas fa-building"></i> VENDOR</label>
+                            <div class="field-row">
+                                <div class="field"><label>Name</label><input type="text" id="i_vendorName" placeholder="KHAJA FAYAZ AHMED" /></div>
+                                <div class="field"><label>Company</label><input type="text" id="i_vendorCompany" placeholder="DEFENCE ELV SYSTEMS" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Address</label><input type="text" id="i_vendorAddress" placeholder="Mawin Gold Plaza, Mehdipatnam" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Phone</label><input type="text" id="i_vendorPhone" placeholder="8179113882" /></div>
+                                <div class="field"><label>Email</label><input type="text" id="i_vendorEmail" placeholder="fayazdefence@gmail.com" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Website</label><input type="text" id="i_vendorWebsite" placeholder="www.defencesurveillance.com" /></div>
+                                <div class="field"><label>GST</label><input type="text" id="i_vendorGst" placeholder="GSTIN" /></div>
+                            </div>
+                        </div>
+                        <div class="party-group">
+                            <label><i class="fas fa-user"></i> CLIENT</label>
+                            <select id="i_docCustomerSelect" onchange="fillDocCustomer('i_')" style="width:100%; margin-bottom:0.4rem;">
+                                <option value="">Load Customer...</option>
+                            </select>
+                            <div class="field-row">
+                                <div class="field"><label>Name</label><input type="text" id="i_clientName" placeholder="Client name" /></div>
+                                <div class="field"><label>Company</label><input type="text" id="i_clientCompany" placeholder="M.A CASTING & DIE CASTING" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Address</label><input type="text" id="i_clientAddress" placeholder="Kukatpally, Hyderabad" /></div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field"><label>Phone</label><input type="text" id="i_clientPhone" placeholder="Client phone" /></div>
+                                <div class="field"><label>GST</label><input type="text" id="i_clientGst" placeholder="Client GST" /></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-details">
+                        <div class="project-header"><i class="fas fa-clipboard-list"></i> PROJECT DETAILS</div>
+                        <div class="project-grid">
+                            <div class="field"><label>Project Name</label><input type="text" id="i_projectName" placeholder="CCTV Installation - Phase 2" /></div>
+                            <div class="field"><label>Location</label><input type="text" id="i_projectLocation" placeholder="Site address" /></div>
+                            <div class="field"><label>Scope</label><input type="text" id="i_projectScope" placeholder="Supply & Install 20 IP cameras" /></div>
+                            <div class="field"><label>Start Date</label><input type="date" id="i_projectStartDate" /></div>
+                            <div class="field"><label>End Date</label><input type="date" id="i_projectEndDate" /></div>
+                            <div class="field"><label>Manager</label><input type="text" id="i_projectManager" placeholder="Contact person" /></div>
+                        </div>
+                    </div>
+                    <div class="items-section">
+                        <div class="table-wrap">
+                            <table class="items-table" id="i_itemsTable">
+                                <thead><tr><th style="width:36px;">#</th><th style="min-width:220px;">DESCRIPTION</th><th style="width:60px;">QTY</th><th style="width:90px;">UNIT PRICE</th><th style="width:90px;text-align:right;">TOTAL</th><th style="width:70px;text-align:center;">ACTIONS</th></tr></thead>
+                                <tbody id="i_itemsBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="add-item-row admin-only" id="i_addItemRow">
+                            <input type="text" id="i_newItemDesc" placeholder="Item description..." style="flex:2;" />
+                            <input type="text" id="i_newItemHsn" placeholder="HSN" style="flex:0 0 60px;" />
+                            <input type="number" id="i_newItemQty" placeholder="Qty" class="qty-add" value="1" min="1" />
+                            <input type="number" id="i_newItemPrice" placeholder="Price" class="price-add" value="0" min="0" step="0.01" />
+                            <button id="i_addItemBtn"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-box">
+                            <div class="line"><span>Subtotal</span><span class="amount" id="i_subtotalDisplay">₹0.00</span></div>
+                            <div class="line" style="display:flex; align-items:center; gap:0.4rem;">
+                                <span>GST</span>
+                                <input type="number" id="i_gstRate" value="18" min="0" max="100" step="0.5" style="width:50px;padding:0.1rem 0.2rem;font-size:0.75rem;text-align:center;" />
+                                <span>%</span>
+                                <span class="amount" id="i_gstDisplay">₹0.00</span>
+                            </div>
+                            <div class="line total"><span>TOTAL</span><span class="amount" id="i_totalDisplay">₹0.00</span></div>
+                            <div class="amount-in-words"><strong id="i_amountWords">Zero</strong> only</div>
+                        </div>
+                    </div>
+                    <div class="terms-section">
+                        <div class="terms-grid">
+                            <div class="term-box">
+                                <h4><i class="fas fa-handshake"></i> Payment Terms</h4>
+                                <textarea id="i_termsPayment" rows="2">1. 75% advance payment is required upon confirmation of the order. Work will commence once the payment is received.
+                                    2. The remaining 25% is due upon project completion, prior to the handover of login credentials and final documentation.
+                                3. All payments should be made via bank transfer, and receipts will be issued for each transaction.</textarea>
+                            </div>
+                            <div class="term-box">
+                                <h4><i class="fas fa-shield"></i> Warranty Terms</h4>
+                                <textarea id="i_termsWarranty" rows="2">1. 1-year warranty is provided covering manufacturing defects.
+                                    2. The warranty excludes damage caused by electrical burns, physical impact, or misuse.
+                                3. Each CCTV installation includes 1-year complimentary service, which covers routine system checks, basic troubleshooting, and remote support to ensure smooth operation.</textarea>
+                            </div>
+                            <div class="term-box">
+                                <h4><i class="fas fa-tools"></i> Site Requirements</h4>
+                                <textarea id="i_termsSite" rows="2">1. Provision of scaffolding, ladders, or a suitable high table if required for installation.
+                                    2. A reliable internet connection must be available on-site to enable mobile access to CCTV cameras.
+                                3. An LED screen or monitor should be arranged by the client for final configuration and demonstration.</textarea>
+                            </div>
+                            <div class="term-box">
+                                <h4><i class="fas fa-file-signature"></i> Declaration</h4>
+                                <textarea id="i_termsDeclaration" rows="2">1. This invoice is valid for 7 calendar days from the date of issue.
+                                    2. Our business is built on trust, reliability, and client satisfaction. We take pride in delivering high-quality work and maintaining professional standards.</textarea>
+                            </div>
+                        </div>
+                        <div class="terms-footer">
+                            <i class="fas fa-check-circle"></i> All quoted prices are final and inclusive of labor, materials, and installation. No hidden charges.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ============================================================
+    BOTTOM NAV (mobile)
+    ============================================================ -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="active" data-page="dashboard"><i class="fas fa-th-large"></i><span>Dashboard</span></button>
+        <button data-page="quotation" data-doctype="quotation"><i class="fas fa-file-invoice"></i><span>Quotation</span></button>
+        <button data-page="invoice" data-doctype="invoice"><i class="fas fa-file-invoice-dollar"></i><span>Invoice</span></button>
+        <button id="bottomMore"><i class="fas fa-ellipsis-h"></i><span>More</span></button>
+    </nav>
+
+    <!-- ============================================================
+    CUSTOMER MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal-box">
+            <div class="modal-header"><h2 id="customerModalTitle">Add Customer</h2><button class="modal-close" onclick="closeCustomerModal()"><i class="fas fa-times"></i></button></div>
+            <input type="hidden" id="custId" />
+            <div class="field"><label>Name *</label><input type="text" id="custName" /></div>
+            <div class="field"><label>Company</label><input type="text" id="custCompany" /></div>
+            <div class="field"><label>Address</label><input type="text" id="custAddress" /></div>
+            <div class="field"><label>Phone</label><input type="text" id="custPhone" /></div>
+            <div class="field"><label>Email</label><input type="email" id="custEmail" /></div>
+            <div class="field"><label>GSTIN</label><input type="text" id="custGstin" /></div>
+            <div class="field"><label>Opening Balance</label><input type="number" id="custOpeningBal" value="0" /></div>
+            <button class="btn-primary admin-only" style="margin-top:1rem;" onclick="saveCustomer()">Save</button>
+            <button class="btn-outline" onclick="closeCustomerModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    PRODUCT MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-box">
+            <div class="modal-header"><h2 id="productModalTitle">Add Product</h2><button class="modal-close" onclick="closeProductModal()"><i class="fas fa-times"></i></button></div>
+            <input type="hidden" id="prodId" />
+            <div class="field"><label>Name *</label><input type="text" id="prodName" /></div>
+            <div class="field"><label>HSN Code</label><input type="text" id="prodHsn" /></div>
+            <div class="field"><label>Unit Price *</label><input type="number" id="prodPrice" value="0" /></div>
+            <div class="field"><label>Category</label><select id="prodCategory"></select></div>
+            <button class="btn-primary admin-only" style="margin-top:1rem;" onclick="saveProduct()">Save</button>
+            <button class="btn-outline" onclick="closeProductModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    MONTH/YEAR MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="monthYearModal">
+        <div class="modal-box">
+            <div class="modal-header"><h2>Create New Document</h2><button class="modal-close" onclick="closeMonthYearModal()"><i class="fas fa-times"></i></button></div>
+            <div style="display:flex; gap:1rem;">
+                <div class="field"><label>Month</label><select id="newDocMonth"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+                <div class="field"><label>Year</label><input type="number" id="newDocYear" min="2020" max="2099" value="2026" /></div>
+            </div>
+            <button class="btn-primary" style="margin-top:1.5rem; width:100%;" onclick="createNewFileWithDate()">Create Document</button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    TOAST CONTAINER
+    ============================================================ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================================
+    SCRIPTS
+    ============================================================ -->
+    <script src="script.js">
+    </script>
+</body>
+</html>
