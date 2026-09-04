@@ -1,0 +1,260 @@
+/* ============================================================
+   DEFENCE ELV SYSTEMS — SUPPLEMENTARY STYLES
+   This file is ADDITIVE ONLY. All base theme, layout, sidebar,
+   dashboard, document, and modal styling live in index.html's
+   inline <style> block (the approved design baseline) and MUST
+   NOT be duplicated or overridden here except where explicitly
+   needed for new modules (Payments, Ledger, Statement, GST
+   Dashboard, status badges) added during this build.
+   Uses the SAME CSS variables already defined in index.html.
+   ============================================================ */
+
+/* ===== STATUS BADGES (Quotation / Invoice / Payment) ===== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.status-badge.status-pending { background: rgba(245, 158, 11, 0.14); color: #b45309; }
+.status-badge.status-approved { background: rgba(16, 185, 129, 0.14); color: #047857; }
+.status-badge.status-rejected { background: rgba(239, 68, 68, 0.14); color: #b91c1c; }
+.status-badge.status-converted { background: rgba(59, 130, 246, 0.14); color: #1d4ed8; }
+.status-badge.status-unpaid { background: rgba(239, 68, 68, 0.14); color: #b91c1c; }
+.status-badge.status-partially-paid { background: rgba(245, 158, 11, 0.14); color: #b45309; }
+.status-badge.status-paid { background: rgba(16, 185, 129, 0.14); color: #047857; }
+.status-badge.status-cancelled { background: rgba(100, 116, 139, 0.16); color: #475569; }
+.status-badge.status-overpaid { background: rgba(59, 130, 246, 0.14); color: #1d4ed8; }
+
+[data-theme="dark"] .status-badge.status-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+[data-theme="dark"] .status-badge.status-approved { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+[data-theme="dark"] .status-badge.status-rejected { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+[data-theme="dark"] .status-badge.status-converted { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+[data-theme="dark"] .status-badge.status-unpaid { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+[data-theme="dark"] .status-badge.status-partially-paid { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+[data-theme="dark"] .status-badge.status-paid { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+[data-theme="dark"] .status-badge.status-cancelled { background: rgba(100, 116, 139, 0.25); color: #cbd5e1; }
+[data-theme="dark"] .status-badge.status-overpaid { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+/* ===== DOC STATUS BAR (on quotation/invoice cards) ===== */
+.doc-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: var(--radius-sm, 10px);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+.doc-status-bar .status-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.doc-status-bar select.status-select {
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.doc-status-bar .btn-small {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--gradient-main);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.doc-status-bar .btn-small.btn-outline-small {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+/* ===== CUSTOMER PICKER ON DOCUMENT ===== */
+.customer-picker-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.customer-picker-row select {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+.customer-picker-row .customer-picker-hint {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+/* ===== INVOICE PAYMENT INFO BOX ===== */
+.payment-info-box {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm, 10px);
+  padding: 0.85rem 1rem;
+  margin-top: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+.payment-info-box .pi-item .pi-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+}
+.payment-info-box .pi-item .pi-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.payment-info-box .pi-item .pi-value.balance-due { color: var(--danger); }
+.payment-info-box .pi-item .pi-value.paid-amount { color: var(--success); }
+
+/* ===== PAYMENTS PAGE ===== */
+#page-payments .payments-toolbar,
+#page-ledger .ledger-toolbar,
+#page-statement .statement-toolbar,
+#page-gst .gst-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+#page-payments select, #page-ledger select, #page-statement select,
+#page-payments input, #page-statement input {
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--gray-200);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+.ledger-balance-cell.dr { color: var(--danger); font-weight: 700; }
+.ledger-balance-cell.cr { color: var(--success); font-weight: 700; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.empty-state-row td {
+  text-align: center;
+  padding: 2rem;
+  color: var(--gray-400);
+  font-style: italic;
+}
+
+/* ===== GST DASHBOARD ===== */
+.gst-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1.25rem;
+}
+.gst-summary-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--card-shadow);
+}
+.gst-summary-card .gst-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.gst-summary-card .gst-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 0.25rem;
+}
+
+/* ===== SIDEBAR EXTRA NAV ITEMS (Payments/Ledger) reuse .nav-item styling ===== */
+
+/* ===== PRINT: RECEIPT ===== */
+.receipt-print-only { display: none; }
+@media print {
+  body.printing-receipt .app > * { display: none !important; }
+  body.printing-receipt .receipt-print-only { display: block !important; }
+}
+
+/* ===== SAFE-DELETE WARNING BOX ===== */
+.safe-delete-warning {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.78rem;
+  margin: 0.6rem 0;
+}
+
+/* ===== RESPONSIVE: new pages ===== */
+@media (max-width: 700px) {
+  .payment-info-box { grid-template-columns: repeat(2, 1fr); }
+  .gst-summary-grid { grid-template-columns: repeat(2, 1fr); }
+  #page-payments .payments-toolbar,
+  #page-ledger .ledger-toolbar,
+  #page-statement .statement-toolbar,
+  #page-gst .gst-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ===== GLOBAL SEARCH RESULTS ===== */
+.search-result-item {
+  padding: 0.55rem 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-bottom: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: var(--gray-100); }
+.search-result-item .sr-type {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 6px;
+  background: var(--gradient-main);
+  color: #fff;
+  flex-shrink: 0;
+}
+.search-result-empty {
+  padding: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+@media (max-width: 900px) {
+  .topbar-global-search { display: none; }
+}
